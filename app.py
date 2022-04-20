@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect
+
+from FormRecognizer import FormRecognizer
 from storage import Storage
+from computer_vision import ComputerVision
 from TextAnalytics import TextAnalytics
 
 
@@ -16,7 +19,7 @@ def text_analytics():
     return render_template('textAnalytics.html')
 
 
-@app.route('/textAnalytics/result',methods=['POST', 'GET'])
+@app.route('/textAnalytics/result', methods=['POST', 'GET'])
 def text_analytics_results():
     output = request.form.to_dict()
     description = output["description"]
@@ -31,7 +34,7 @@ def form_recognizer():
     return render_template('form.html')
 
 
-@app.route('/formRecognizer/result',methods=['POST', 'GET'])
+@app.route('/formRecognizer/result', methods=['POST', 'GET'])
 def form_recognizer_results():
     output = request.form.to_dict()
     description = output["description"]
@@ -75,6 +78,34 @@ def upload_photos():
 
     elif request.method == 'GET':
         return render_template('upload.html')
+
+
+@app.route('/Hand-To-Text', methods=['GET', 'POST'])
+def hand_to_text():
+    if request.method == 'GET':
+        return render_template('image_form.html')
+
+    if request.method == 'POST':
+        computer_vision = ComputerVision()
+
+        file_to_analyze = request.files.getlist('photos')[0]
+        print(file_to_analyze.filename)
+
+        texts = computer_vision.identify_text_from_local_file_str(file_to_analyze)
+
+        # storage = Storage.storage()
+        # storage.container_client.upload_blob(file_to_analyze.filename, file_to_analyze)
+        #
+        # url = None
+        # blob_items = storage.container_client.list_blobs()
+        # for blob in blob_items:
+        #     print(blob.name)
+        #     if blob.name == file_to_analyze.filename:
+        #         blob_client = storage.container_client.get_blob_client(blob=blob.name)
+        #         url = blob_client.url
+        #         break
+
+        return render_template('image_text.html', image=file_to_analyze, texts=texts)
 
 
 if __name__ == '__main__':
