@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request, redirect
 
 from FormRecognizer import FormRecognizer
+from speech import text_to_speech
 from storage import Storage
 from computer_vision import ComputerVision
 from TextAnalytics import TextAnalytics
 
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "mysecretkey"
 
 
 @app.route('/')
 def start_page():
     return render_template('index.html')
+
 
 
 @app.route('/textAnalytics')
@@ -106,6 +109,23 @@ def hand_to_text():
         #         break
 
         return render_template('image_text.html', image=file_to_analyze, texts=texts)
+
+
+
+@app.route('/texttospeech',methods=("GET", "POST"))
+def text_to_speech_page():
+    form = text_to_speech.Widgets()
+    if request.method == "GET":
+        return render_template('speech.html', form=form)
+    if request.method == "POST":
+        text = request.form["text"]
+        text_to_speech.text_to_speach(text)
+        return render_template('speech.html', form=form)
+    return render_template('speech.html', form=form)
+
+@app.route('/search')
+def search_page():
+    return render_template('search.html')
 
 
 if __name__ == '__main__':
