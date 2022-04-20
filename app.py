@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from storage import Storage
+from TextAnalytics import TextAnalytics
+
 
 app = Flask(__name__)
 
@@ -8,6 +10,19 @@ app = Flask(__name__)
 def start_page():
     return render_template('index.html')
 
+
+@app.route('/textAnalytics')
+def text_analytics():
+    return render_template('textAnalytics.html')
+
+@app.route('/textAnalytics/result',methods=['POST', 'GET'])
+def results():
+    output = request.form.to_dict()
+    description = output["description"]
+    print(description)
+    results = TextAnalytics.reviews(description)
+    print(results)
+    return render_template('textAnalytics.html', description=results)
 
 @app.route('/<int:count>')
 def second_page(count):
