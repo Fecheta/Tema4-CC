@@ -15,14 +15,31 @@ def start_page():
 def text_analytics():
     return render_template('textAnalytics.html')
 
+
 @app.route('/textAnalytics/result',methods=['POST', 'GET'])
-def results():
+def text_analytics_results():
     output = request.form.to_dict()
     description = output["description"]
     print(description)
     results = TextAnalytics.reviews(description)
     print(results)
     return render_template('textAnalytics.html', description=results)
+
+
+@app.route('/formRecognizer')
+def form_recognizer():
+    return render_template('form.html')
+
+
+@app.route('/formRecognizer/result',methods=['POST', 'GET'])
+def form_recognizer_results():
+    output = request.form.to_dict()
+    description = output["description"]
+    print(description)
+    results = FormRecognizer.get_information(description)
+    print(results)
+    return render_template('form.html', description=results)
+
 
 @app.route('/<int:count>')
 def second_page(count):
